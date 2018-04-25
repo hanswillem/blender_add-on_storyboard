@@ -37,24 +37,45 @@ import bpy
 #the main functions
 def main_exportImagesAll():
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_set(mrks[i])
         bpy.context.scene.render.filepath = "//sh_" + "%03d" % (i + 1,)
-        bpy.ops.render.opengl(write_still=True)
+        bpy.ops.render.opengl(write_still = True)
     #reset path and playhead
     bpy.context.scene.render.filepath = fp
     bpy.context.scene.frame_set(f)
+
+
+def getShotNumberUnderPlayhead():
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    f = bpy.context.scene.frame_current
+    for i in range(len(mrks) - 1):
+        if mrks[i] <= f < mrks[i + 1]:
+            return i + 1
+
+
+def getShotLengthUnderPlayhead():
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    f = bpy.context.scene.frame_current
+    for i in range(len(mrks) - 1):
+        if mrks[i] <= f < mrks[i + 1]:
+            return mrks[i + 1] - mrks [i]
+
 
 def main_exportAudioAll():
     rng_start = bpy.context.scene.frame_start
     rng_end = bpy.context.scene.frame_end
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_start = mrks[i]
         bpy.context.scene.frame_end = mrks[i + 1] - 1  
-        bpy.ops.sound.mixdown(filepath = bpy.path.abspath("//sh_") + "%03d" % (i + 1,) + ".wav", codec='PCM')
+        bpy.ops.sound.mixdown(filepath = bpy.path.abspath("//sh_") + "%03d" % (i + 1,) + ".wav", codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
@@ -64,12 +85,13 @@ def main_exportAudioIndividual():
     rng_start = bpy.context.scene.frame_start
     rng_end = bpy.context.scene.frame_end
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
     f = bpy.context.scene.frame_current
     for i in range(len(mrks) - 1):
         if mrks[i] <= f < mrks[i + 1]:
             bpy.context.scene.frame_start = mrks[i]
             bpy.context.scene.frame_end = mrks[i + 1] - 1 
-            bpy.ops.sound.mixdown(filepath = bpy.path.abspath("//sh_") + "%03d" % (i + 1,) + ".wav", codec='PCM')
+            bpy.ops.sound.mixdown(filepath = bpy.path.abspath("//sh_") + "%03d" % (i + 1,) + ".wav", codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
@@ -82,7 +104,6 @@ def checkStuffImages():
     #check if the blend file is saved
     if bpy.data.is_saved == False:
         return False
-
 
     #return true if all the above conditions are met
     else:
@@ -127,7 +148,7 @@ class Panel_images(bpy.types.Panel):
         layout = self.layout
         #layout.label('My Label')
         col = layout.column(align = True)
-        col.operator('script.operator_export_images_all', text="Export All Images")
+        col.operator('script.operator_export_images_all', text = "Export All Images")
 
 
 #panel audio
@@ -146,9 +167,8 @@ class Panel_audio(bpy.types.Panel):
         layout = self.layout
         #layout.label('My Label')
         col = layout.column(align = True)
-        col.operator('script.operator_export_audio_all', text="Export All Audio CLips")
-        col.operator('script.operator_export_audio_individual', text="Export Current Audio Clip")
-
+        col.operator('script.operator_export_audio_all', text = "Export All")
+        col.operator('script.operator_export_audio_individual', text = "Export Current")
 
 
 #panel info
@@ -165,8 +185,12 @@ class Panel_info(bpy.types.Panel):
     #draw loop
     def draw(self, context):
         layout = self.layout
-        layout.label('Shots: ' +str(len([marker.frame for marker in bpy.context.scene.timeline_markers]) - 1))
-        layout.label('Length Current Shot: ')
+        sh_amnt = len([marker.frame for marker in bpy.context.scene.timeline_markers]) - 1
+        if sh_amnt == -1:
+            sh_amnt = 0;
+        layout.label('Total Shots: ' + str(sh_amnt))
+        layout.label('Shot: ' + str(getShotNumberUnderPlayhead()))
+        layout.label('Length: ' + str(getShotLengthUnderPlayhead()))
 
 
 #operator class
