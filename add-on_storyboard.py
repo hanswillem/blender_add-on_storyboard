@@ -252,7 +252,7 @@ class Operator_exportAudioIndividual(bpy.types.Operator):
         
         return {'FINISHED'}
 
-
+    
 #registration
 def register():
     bpy.utils.register_class(Panel_images)
