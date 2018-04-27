@@ -7,7 +7,7 @@ To use it, the blendfile must be saved, and you need to place markers in the tim
 Creates a camera, sets the viewport display to *Only Render* and *World Background*.
 
 ### Open Folder
-Opens the folder where the blendile is saved in the finder.
+Opens the folder where the blendfile is saved in the finder.
 
 ### Images - Export All
 Exports the images to the folder where the blendfile is saved.
