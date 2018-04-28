@@ -103,6 +103,10 @@ def main_exportImagesAll():
     #reset path and playhead
     bpy.context.scene.render.filepath = fp
     bpy.context.scene.frame_set(f)
+    bpy.context.scene.render.stamp_note_text = ""
+    bpy.context.scene.render.use_stamp_note = False
+    bpy.context.scene.render.use_stamp = False
+    main_openFolder()
 
 
 def main_exportImagesIndividual():
@@ -111,6 +115,7 @@ def main_exportImagesIndividual():
     bpy.context.scene.render.filepath = "//fr_" + "%03d" % (f,)
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
+    main_openFolder()
 
 
 def checkStuffImages():
@@ -143,6 +148,7 @@ def main_exportAudioAll():
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
+    main_openFolder()
 
 
 def main_exportAudioIndividual():
@@ -159,6 +165,7 @@ def main_exportAudioIndividual():
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
+    main_openFolder
 
 
 def checkStuffAudio():
