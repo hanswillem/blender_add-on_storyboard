@@ -64,10 +64,9 @@ def getShotNumberUnderPlayhead():
             return i + 1
 
 
-def getShotLengthUnderPlayhead():
+def getShotLength(f):
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
-    f = bpy.context.scene.frame_current
     for i in range(len(mrks) - 1):
         if mrks[i] <= f < mrks[i + 1]:
             return mrks[i + 1] - mrks [i]
@@ -78,6 +77,19 @@ def getShotLengthUnderPlayhead():
 #------------------------------------------------------------------------------------------------------------------------------
 
 
+def stamp(f):
+    bpy.context.scene.render.use_stamp = True
+    bpy.context.scene.render.use_stamp_time = False
+    bpy.context.scene.render.use_stamp_date = False
+    bpy.context.scene.render.use_stamp_render_time = False
+    bpy.context.scene.render.use_stamp_frame = False
+    bpy.context.scene.render.use_stamp_scene = False
+    bpy.context.scene.render.use_stamp_camera = False
+    bpy.context.scene.render.use_stamp_filename = False
+    bpy.context.scene.render.use_stamp_note = True
+    bpy.context.scene.render.stamp_note_text = "frames: " + str(getShotLength(f))
+
+
 def main_exportImagesAll():
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
@@ -85,6 +97,7 @@ def main_exportImagesAll():
     f = bpy.context.scene.frame_current
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_set(mrks[i])
+        stamp(mrks[i])
         bpy.context.scene.render.filepath = "//sh_" + "%03d" % (i + 1,)
         bpy.ops.render.opengl(write_still = True)
     #reset path and playhead
@@ -95,6 +108,7 @@ def main_exportImagesAll():
 def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
+    stamp(f)
     bpy.context.scene.render.filepath = "//fr_" + "%03d" % (f,)
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
@@ -192,13 +206,12 @@ class Panel_setup(bpy.types.Panel):
         col = layout.column(align = True)
         col.operator('script.operator_setup', text = "Setup Viewport")
         col.operator('script.operator_open_folder', text = "Open Folder")
-        col.operator('script.operator_render_video', text = "Render Video")
         sh_amnt = len([marker.frame for marker in bpy.context.scene.timeline_markers]) - 1
         if sh_amnt == -1:
             sh_amnt = 0
         layout.label('Total Shots: ' + str(sh_amnt))
         layout.label('Shot: ' + str(getShotNumberUnderPlayhead()))
-        layout.label('Length: ' + str(getShotLengthUnderPlayhead()))
+        layout.label('Length: ' + str(getShotLength(bpy.context.scene.frame_current)))
 
 
 #operator class
