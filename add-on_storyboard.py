@@ -77,7 +77,7 @@ def getShotLength(f):
 #------------------------------------------------------------------------------------------------------------------------------
 
 
-def stamp(f):
+def stamp(s, f):
     bpy.context.scene.render.use_stamp = True
     bpy.context.scene.render.use_stamp_time = False
     bpy.context.scene.render.use_stamp_date = False
@@ -87,7 +87,7 @@ def stamp(f):
     bpy.context.scene.render.use_stamp_camera = False
     bpy.context.scene.render.use_stamp_filename = False
     bpy.context.scene.render.use_stamp_note = True
-    bpy.context.scene.render.stamp_note_text = "frames: " + str(getShotLength(f))
+    bpy.context.scene.render.stamp_note_text = "sh_" + "%03d" % (s + 1,) + " length: " + str(getShotLength(f))
 
 
 def main_exportImagesAll():
@@ -97,7 +97,7 @@ def main_exportImagesAll():
     f = bpy.context.scene.frame_current
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_set(mrks[i])
-        stamp(mrks[i])
+        stamp(i, mrks[i])
         bpy.context.scene.render.filepath = "//sh_" + "%03d" % (i + 1,)
         bpy.ops.render.opengl(write_still = True)
     #reset path and playhead
@@ -108,7 +108,6 @@ def main_exportImagesAll():
 def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
-    stamp(f)
     bpy.context.scene.render.filepath = "//fr_" + "%03d" % (f,)
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
