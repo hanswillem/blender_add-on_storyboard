@@ -10,11 +10,11 @@ Creates a camera, sets the viewport display to *Only Render* and *World Backgrou
 Opens the folder where the blendfile is saved in the finder.
 
 ### Images - Export All
-Exports the images to the folder where the blendfile is saved.
+Exports the images to the folder where the blendfile is saved. The length of the shot is stamped into the image.
 Note that it does this based on the shots (i.e. the markers) and not on the keyframes!
 
 ### Images - Export Individual
-Exports the image that is currently in the viewport to the folder where the blendfile is saved.
+Exports the image that is currently in the viewport to the folder where the blendfile is saved. The length of the shot is stamped into the image.
 
 ### Audio - Export All
 Exports the audio as clips based on the shots to the folder where the blendfile is saved.
