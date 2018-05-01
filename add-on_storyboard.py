@@ -79,6 +79,8 @@ def getShotLength(f):
 
 def stamp(s, f):
     bpy.context.scene.render.use_stamp = True
+    bpy.context.scene.render.stamp_foreground = (1, 1, 1, 1)
+    bpy.context.scene.render.stamp_background = (0, 0, 0, 1)
     bpy.context.scene.render.use_stamp_time = False
     bpy.context.scene.render.use_stamp_date = False
     bpy.context.scene.render.use_stamp_render_time = False
@@ -113,7 +115,7 @@ def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
     stamp(getShotNumberUnderPlayhead(), f)
-    bpy.context.scene.render.filepath = '//fr_' + '%03d' % (f,)
+    bpy.context.scene.render.filepath = '//sh_' + '%03d' % (getShotNumberUnderPlayhead(),)
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
     main_openFolder()
@@ -145,7 +147,7 @@ def main_exportAudioAll():
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_start = mrks[i]
         bpy.context.scene.frame_end = mrks[i + 1] - 1  
-        bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//sh_') + '%03d' % (i + 1,) + '.wav', codec = 'PCM')
+        bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//sh_') + '%03d' % (i + 1,) + '.wav',  container='WAV', codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
@@ -155,14 +157,14 @@ def main_exportAudioAll():
 def main_exportAudioIndividual():
     rng_start = bpy.context.scene.frame_start
     rng_end = bpy.context.scene.frame_end
-    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers] 
     mrks.sort()
     f = bpy.context.scene.frame_current
     for i in range(len(mrks) - 1):
         if mrks[i] <= f < mrks[i + 1]:
             bpy.context.scene.frame_start = mrks[i]
             bpy.context.scene.frame_end = mrks[i + 1] - 1 
-            bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//sh_') + '%03d' % (i + 1,) + '.wav', codec = 'PCM')
+            bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//sh_') + '%03d' % (i + 1,) + '.wav', container='WAV', codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
@@ -402,9 +404,13 @@ class Panel_info(bpy.types.Panel):
         sh_amnt = len([marker.frame for marker in bpy.context.scene.timeline_markers]) - 1
         if sh_amnt == -1:
             sh_amnt = 0
-        layout.label('Total Shots: ' + str(sh_amnt))
-        layout.label('Shot: ' + str(getShotNumberUnderPlayhead()))
-        layout.label('Length: ' + str(getShotLength(bpy.context.scene.frame_current)))
+        sh_amnt = str(sh_amnt)
+        sh = '%03d' % (getShotNumberUnderPlayhead(),) 
+        sh_len_f = str(getShotLength(bpy.context.scene.frame_current))
+        sh_len_s = str(getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps)
+        layout.label('Total Shots: ' + sh_amnt)
+        layout.label('Shot: ' + sh)
+        layout.label('Length: ' + sh_len_f + ' (' + sh_len_s + ')')
 
 
 #------------------------------------------------------------------------------------------------------------------------------
