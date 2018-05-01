@@ -55,7 +55,7 @@ def main_openFolder():
     os.system('open ' + (bpy.path.abspath('//')))
 
 
-def getShotNumberUnderPlayhead():
+def main_getShotNumberUnderPlayhead():
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
     f = bpy.context.scene.frame_current
@@ -64,7 +64,7 @@ def getShotNumberUnderPlayhead():
             return i + 1
 
 
-def getShotLength(f):
+def main_getShotLength(f):
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
     for i in range(len(mrks) - 1):
@@ -77,7 +77,7 @@ def getShotLength(f):
 #------------------------------------------------------------------------------------------------------------------------------
 
 
-def stamp(s, f):
+def main_stamp(s, f):
     bpy.context.scene.render.use_stamp = True
     bpy.context.scene.render.stamp_foreground = (1, 1, 1, 1)
     bpy.context.scene.render.stamp_background = (0, 0, 0, 1)
@@ -89,7 +89,7 @@ def stamp(s, f):
     bpy.context.scene.render.use_stamp_camera = False
     bpy.context.scene.render.use_stamp_filename = False
     bpy.context.scene.render.use_stamp_note = True
-    bpy.context.scene.render.stamp_note_text = 'sh_' + '%03d' % (s,) + ' length: ' + str(getShotLength(f))
+    bpy.context.scene.render.stamp_note_text = 'sh_' + '%03d' % (s,) + ' length: ' + str(main_getShotLength(f))
 
 
 def main_exportImagesAll():
@@ -99,7 +99,7 @@ def main_exportImagesAll():
     f = bpy.context.scene.frame_current
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_set(mrks[i])
-        stamp(i + 1, mrks[i])
+        main_stamp(i + 1, mrks[i])
         bpy.context.scene.render.filepath = '//sh_' + '%03d' % (i + 1,)
         bpy.ops.render.opengl(write_still = True)
     #reset path and playhead
@@ -114,14 +114,14 @@ def main_exportImagesAll():
 def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
-    stamp(getShotNumberUnderPlayhead(), f)
-    bpy.context.scene.render.filepath = '//sh_' + '%03d' % (getShotNumberUnderPlayhead(),)
+    main_stamp(main_getShotNumberUnderPlayhead(), f)
+    bpy.context.scene.render.filepath = '//sh_' + '%03d' % (main_getShotNumberUnderPlayhead(),)
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
     main_openFolder()
 
 
-def checkStuffImages():
+def main_checkStuffImages():
     #check if there are markers
     if len(bpy.context.scene.timeline_markers) == 0:
         return False
@@ -171,7 +171,7 @@ def main_exportAudioIndividual():
     main_openFolder()
 
 
-def checkStuffAudio():
+def main_checkStuffAudio():
     #check if there are markers
     if len(bpy.context.scene.timeline_markers) < 2:
         return False
@@ -289,7 +289,7 @@ class Operator_exportImagesAll(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return checkStuffImages()
+        return main_checkStuffImages()
 
     #execute
     def execute(self, context):
@@ -353,7 +353,7 @@ class Operator_exportAllAudio(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return checkStuffAudio()
+        return main_checkStuffAudio()
 
     #execute
     def execute(self, context):
@@ -373,7 +373,7 @@ class Operator_exportAudioIndividual(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return checkStuffAudio()
+        return main_checkStuffAudio()
 
     #execute
     def execute(self, context):
@@ -405,9 +405,9 @@ class Panel_info(bpy.types.Panel):
         if sh_amnt == -1:
             sh_amnt = 0
         sh_amnt = str(sh_amnt)
-        sh = '%03d' % (getShotNumberUnderPlayhead(),) 
-        sh_len_f = str(getShotLength(bpy.context.scene.frame_current))
-        sh_len_s = str(getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps)
+        sh = '%03d' % (main_getShotNumberUnderPlayhead(),) 
+        sh_len_f = str(main_getShotLength(bpy.context.scene.frame_current))
+        sh_len_s = str(main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps)
         layout.label('Total Shots: ' + sh_amnt)
         layout.label('Shot: ' + sh)
         layout.label('Length: ' + sh_len_f + ' (' + sh_len_s + ')')
