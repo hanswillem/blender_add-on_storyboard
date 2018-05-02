@@ -72,6 +72,23 @@ def main_getShotLength(f):
             return mrks[i + 1] - mrks [i]
 
 
+def main_getShotNumberOfFrame(f):
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    for i in range(len(mrks) - 1):
+        if mrks[i] <= f < mrks[i + 1]:
+            return i + 1
+
+
+def main_renameMarkers():
+    for i in bpy.context.scene.timeline_markers:
+        s = main_getShotNumberOfFrame(i.frame)
+        if s == None:
+            i.name = 'end'
+        else:
+            i.name = 'sh_' + '%03d' % (main_getShotNumberOfFrame(i.frame),)
+
+
 #------------------------------------------------------------------------------------------------------------------------------
 # main functions - images
 #------------------------------------------------------------------------------------------------------------------------------
@@ -214,6 +231,7 @@ class Panel_setup(bpy.types.Panel):
         layout = self.layout
         col = layout.column(align = True)
         col.operator('script.operator_setup', text = 'Setup Viewport')
+        col.operator('script.operator_rename_markers', text = 'Rename Markers')
         col.operator('script.operator_open_folder', text = 'Open Folder')
         
 
@@ -229,6 +247,26 @@ class Operator_setup(bpy.types.Operator):
     #execute
     def execute(self, context):
         main_setup()
+        
+        return {'FINISHED'}
+
+
+#operator class
+class Operator_renameMarkers(bpy.types.Operator):
+    
+    #operator attributes
+    '''Open folder where the blend file is saved'''
+    bl_label = 'Operator Rename Markers'
+    bl_idname = 'script.operator_rename_markers'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return len(bpy.context.scene.timeline_markers) > 1
+
+    #execute
+    def execute(self, context):
+        main_renameMarkers()
         
         return {'FINISHED'}
 
@@ -401,16 +439,18 @@ class Panel_info(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         col = layout.column(align = True)
-        sh_amnt = len([marker.frame for marker in bpy.context.scene.timeline_markers]) - 1
-        if sh_amnt == -1:
-            sh_amnt = 0
-        sh_amnt = str(sh_amnt)
-        sh = '%03d' % (main_getShotNumberUnderPlayhead(),) 
-        sh_len_f = str(main_getShotLength(bpy.context.scene.frame_current))
-        sh_len_s = str(main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps)
-        layout.label('Total Shots: ' + sh_amnt)
-        layout.label('Shot: ' + sh)
-        layout.label('Length: ' + sh_len_f + ' (' + sh_len_s + ')')
+        sh_amnt = len(bpy.context.scene.timeline_markers) - 1
+        if sh_amnt > 0:
+            sh_amnt = str(sh_amnt)
+            layout.label('Total Shots: ' + sh_amnt)
+            if main_getShotNumberOfFrame(bpy.context.scene.frame_current) != None:
+                sh = '%03d' % (main_getShotNumberOfFrame(bpy.context.scene.frame_current),) 
+                sh_len_f = str(main_getShotLength(bpy.context.scene.frame_current))
+                sh_len_s = str(main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps)
+                layout.label('Shot: ' + sh)
+                layout.label('Length: ' + sh_len_f + ' (' + sh_len_s + ')')
+        else:
+            layout.label('No Shots')
 
 
 #------------------------------------------------------------------------------------------------------------------------------
@@ -425,6 +465,7 @@ def register():
     bpy.utils.register_class(Panel_info)
 
     bpy.utils.register_class(Operator_setup)
+    bpy.utils.register_class(Operator_renameMarkers)
     bpy.utils.register_class(Operator_openFolder)
     bpy.utils.register_class(Operator_exportImagesAll)
     bpy.utils.register_class(Operator_exportImagesIndividual)
@@ -440,6 +481,7 @@ def unregister():
 
     bpy.utils.unregister_class(Operator_setup)
     bpy.utils.unregister_class(Operator_openFolder)
+    bpy.utils.unregister_class(Operator_renameMarkers)
     bpy.utils.unregister_class(Operator_exportImagesAll)
     bpy.utils.unregister_class(Operator_exportImagesIndividual)
     bpy.utils.unregister_class(Operator_exportAllAudio)
