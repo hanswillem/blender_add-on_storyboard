@@ -55,15 +55,6 @@ def main_openFolder():
     os.system('open ' + (bpy.path.abspath('//')))
 
 
-def main_getShotNumberUnderPlayhead():
-    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
-    mrks.sort()
-    f = bpy.context.scene.frame_current
-    for i in range(len(mrks) - 1):
-        if mrks[i] <= f < mrks[i + 1]:
-            return i + 1
-
-
 def main_getShotLength(f):
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
@@ -117,7 +108,7 @@ def main_exportImagesAll():
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_set(mrks[i])
         main_stamp(i + 1, mrks[i])
-        bpy.context.scene.render.filepath = '//sh_' + '%03d' % (i + 1,)
+        bpy.context.scene.render.filepath = '//' + str(mrks[i].name)
         bpy.ops.render.opengl(write_still = True)
     #reset path and playhead
     bpy.context.scene.render.filepath = fp
@@ -131,11 +122,29 @@ def main_exportImagesAll():
 def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
-    main_stamp(main_getShotNumberUnderPlayhead(), f)
-    bpy.context.scene.render.filepath = '//sh_' + '%03d' % (main_getShotNumberUnderPlayhead(),)
+    s = main_getShotNumberOfFrame(f)
+    main_stamp(s, f)
+    bpy.context.scene.render.filepath = '//sh_' + '%03d' % (s,)
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
     main_openFolder()
+
+
+def main_exportImagesSequence():
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    rng_start = bpy.context.scene.frame_start
+    rng_end = bpy.context.scene.frame_end
+    bpy.context.scene.render.use_stamp = False
+    fp = bpy.context.scene.render.filepath
+    bpy.context.scene.render.filepath = '//seq_' 
+    bpy.context.scene.frame_start = mrks[0]
+    bpy.context.scene.frame_end = mrks[-1]  
+    bpy.ops.render.opengl(animation = True)
+    #reset
+    bpy.context.scene.render.filepath = fp
+    bpy.context.scene.frame_start = rng_start
+    bpy.context.scene.frame_end = rng_end
 
 
 def main_checkStuffImages():
@@ -312,8 +321,29 @@ class Panel_images(bpy.types.Panel):
         layout = self.layout
         #layout.label('My Label')
         col = layout.column(align = True)
-        col.operator('script.operator_export_images_all', text = 'Export All')
+        col.operator('script.operator_export_images_sequence', text = 'Export Sequence')
+        col.operator('script.operator_export_images_all', text = 'Export Shots')
         col.operator('script.operator_export_images_individual', text = 'Export Current')
+
+
+#operator class
+class Operator_exportImagesSequence(bpy.types.Operator):
+    
+    #operator attributes
+    '''Export the timeline as a png sequence'''
+    bl_label = 'Operator Export Images Sequence'
+    bl_idname = 'script.operator_export_images_sequence'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return main_checkStuffImages()
+
+    #execute
+    def execute(self, context):
+        main_exportImagesSequence()
+        
+        return {'FINISHED'}
 
 
 #operator class
@@ -335,6 +365,7 @@ class Operator_exportImagesAll(bpy.types.Operator):
         
         return {'FINISHED'}
     
+
 #operator class
 class Operator_exportImagesIndividual(bpy.types.Operator):
     
@@ -467,6 +498,7 @@ def register():
     bpy.utils.register_class(Operator_setup)
     bpy.utils.register_class(Operator_renameMarkers)
     bpy.utils.register_class(Operator_openFolder)
+    bpy.utils.register_class(Operator_exportImagesSequence)
     bpy.utils.register_class(Operator_exportImagesAll)
     bpy.utils.register_class(Operator_exportImagesIndividual)
     bpy.utils.register_class(Operator_exportAllAudio)
@@ -481,6 +513,7 @@ def unregister():
 
     bpy.utils.unregister_class(Operator_setup)
     bpy.utils.unregister_class(Operator_openFolder)
+    bpy.utils.unregister_class(Operator_exportImagesSequence)
     bpy.utils.unregister_class(Operator_renameMarkers)
     bpy.utils.unregister_class(Operator_exportImagesAll)
     bpy.utils.unregister_class(Operator_exportImagesIndividual)
