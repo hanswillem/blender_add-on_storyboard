@@ -80,12 +80,26 @@ def main_renameMarkers():
             i.name = 'sh_' + '%03d' % (main_getShotNumberOfFrame(i.frame),)
 
 
+def getMarkerNameOfFrame(f):
+    # make a dictionary of marker framenumbers and marker names
+    d_mrks = {}
+    for i in  bpy.context.scene.timeline_markers:
+        d_mrks[i.frame] = i.name
+    # make a list of the frame numbers and sort them
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    # get the marker name and return it
+    for i in range(len(mrks) - 1):
+        if mrks[i] <= f < mrks[i + 1]:
+            return  d_mrks[mrks[i]];
+
+
 #------------------------------------------------------------------------------------------------------------------------------
 # main functions - images
 #------------------------------------------------------------------------------------------------------------------------------
 
 
-def main_stamp(s, f):
+def main_stamp(s):
     bpy.context.scene.render.use_stamp = True
     bpy.context.scene.render.stamp_foreground = (1, 1, 1, 1)
     bpy.context.scene.render.stamp_background = (0, 0, 0, 1)
@@ -97,7 +111,7 @@ def main_stamp(s, f):
     bpy.context.scene.render.use_stamp_camera = False
     bpy.context.scene.render.use_stamp_filename = False
     bpy.context.scene.render.use_stamp_note = True
-    bpy.context.scene.render.stamp_note_text = 'sh_' + '%03d' % (s,) + ' length: ' + str(main_getShotLength(f))
+    bpy.context.scene.render.stamp_note_text = s
 
 
 def main_exportImagesAll():
@@ -105,10 +119,11 @@ def main_exportImagesAll():
     mrks.sort()
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
-    for i in range(len(mrks) - 1):
-        bpy.context.scene.frame_set(mrks[i])
-        main_stamp(i + 1, mrks[i])
-        bpy.context.scene.render.filepath = '//' + str(mrks[i].name)
+    for i in mrks[:-1]:
+        s = str(getMarkerNameOfFrame(i))
+        bpy.context.scene.frame_set(i)
+        main_stamp(s)
+        bpy.context.scene.render.filepath = '//' + s
         bpy.ops.render.opengl(write_still = True)
     #reset path and playhead
     bpy.context.scene.render.filepath = fp
@@ -122,9 +137,9 @@ def main_exportImagesAll():
 def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
-    s = main_getShotNumberOfFrame(f)
-    main_stamp(s, f)
-    bpy.context.scene.render.filepath = '//sh_' + '%03d' % (s,)
+    s = str(getMarkerNameOfFrame(f))
+    main_stamp(s)
+    bpy.context.scene.render.filepath = '//' + s
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
     main_openFolder()
