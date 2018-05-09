@@ -80,7 +80,7 @@ def main_renameMarkers():
             i.name = 'sh_' + '%03d' % (main_getShotNumberOfFrame(i.frame),)
 
 
-def getMarkerNameOfFrame(f):
+def main_getMarkerNameOfFrame(f):
     # make a dictionary of marker framenumbers and marker names
     d_mrks = {}
     for i in  bpy.context.scene.timeline_markers:
@@ -120,7 +120,7 @@ def main_exportImagesAll():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
     for i in mrks[:-1]:
-        s = str(getMarkerNameOfFrame(i))
+        s = str(main_getMarkerNameOfFrame(i))
         bpy.context.scene.frame_set(i)
         main_stamp(s)
         bpy.context.scene.render.filepath = '//' + s
@@ -137,7 +137,7 @@ def main_exportImagesAll():
 def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
-    s = str(getMarkerNameOfFrame(f))
+    s = str(main_getMarkerNameOfFrame(f))
     main_stamp(s)
     bpy.context.scene.render.filepath = '//' + s
     bpy.ops.render.opengl(write_still = True)
