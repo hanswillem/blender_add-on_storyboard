@@ -9,7 +9,10 @@ Creates a camera, sets the viewport display to *Only Render* and *World Backgrou
 ### Open Folder
 Opens the folder where the blendfile is saved in the finder.
 
-### Images - Export All
+### Images - Export Sequence
+Exports the whole timeline (from the first to the last marker) as a png sequence to the folder where the blendfile is saved.
+
+### Images - Export Shots
 Exports the images to the folder where the blendfile is saved. The length of the shot is stamped into the image.
 Note that it does this based on the shots (i.e. the markers) and not on the keyframes!
 
