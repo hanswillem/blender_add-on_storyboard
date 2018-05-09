@@ -16,11 +16,11 @@ Exports the whole timeline (from the first to the last marker) as a png sequence
 Exports the images to the folder where the blendfile is saved. The length of the shot is stamped into the image.
 Note that it does this based on the shots (i.e. the markers) and not on the keyframes!
 
-### Images - Export Individual
+### Images - Export Current
 Exports the image that is currently in the viewport to the folder where the blendfile is saved. 
 
 ### Audio - Export All
 Exports the audio as clips based on the shots to the folder where the blendfile is saved.
 
-### Audio - Export Individual
+### Audio - Export Current
 Exports the audio clips based on the shot currently under the playhead to the folder where the blendfile is saved.
