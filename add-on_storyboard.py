@@ -525,7 +525,7 @@ class Panel_info(bpy.types.Panel):
             sh_amnt = str(sh_amnt)
             layout.label('Total Shots: ' + sh_amnt)
             if main_getShotNumberOfFrame(bpy.context.scene.frame_current) != None:
-                sh = '%03d' % (main_getShotNumberOfFrame(bpy.context.scene.frame_current),) 
+                sh = str(main_getShotNumberOfFrame(bpy.context.scene.frame_current))
                 sh_len_f = str(main_getShotLength(bpy.context.scene.frame_current))
                 sh_len_s = ("%.2f" % (main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps))
                 layout.label('Shot: ' + sh)
