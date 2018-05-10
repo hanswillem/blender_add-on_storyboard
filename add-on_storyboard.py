@@ -202,7 +202,7 @@ def main_exportAudioShots():
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_start = mrks[i]
         bpy.context.scene.frame_end = mrks[i + 1] - 1  
-        bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//sh_') + '%03d' % (i + 1,) + '.wav',  container='WAV', codec = 'PCM')
+        bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//') + str(main_getMarkerNameOfFrame(mrks[i])) + '.wav',  container='WAV', codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
@@ -219,7 +219,7 @@ def main_exportAudioIndividual():
         if mrks[i] <= f < mrks[i + 1]:
             bpy.context.scene.frame_start = mrks[i]
             bpy.context.scene.frame_end = mrks[i + 1] - 1 
-            bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//sh_') + '%03d' % (i + 1,) + '.wav', container='WAV', codec = 'PCM')
+            bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//') + str(main_getMarkerNameOfFrame(mrks[i])) + '.wav', container='WAV', codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
