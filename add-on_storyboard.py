@@ -180,7 +180,21 @@ def main_checkStuffImages():
 #------------------------------------------------------------------------------------------------------------------------------
 
 
-def main_exportAudioAll():
+def main_exportAudioMixdown():
+    rng_start = bpy.context.scene.frame_start
+    rng_end = bpy.context.scene.frame_end
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    bpy.context.scene.frame_start = mrks[0]
+    bpy.context.scene.frame_end = mrks[-1]
+    bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//mixdown') + '.wav',  container='WAV', codec = 'PCM')
+    #reset frame range
+    bpy.context.scene.frame_start = rng_start
+    bpy.context.scene.frame_end = rng_end
+    main_openFolder() 
+
+
+def main_exportAudioShots():
     rng_start = bpy.context.scene.frame_start
     rng_end = bpy.context.scene.frame_end
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
@@ -422,8 +436,29 @@ class Panel_audio(bpy.types.Panel):
         layout = self.layout
         #layout.label('My Label')
         col = layout.column(align = True)
-        col.operator('script.operator_export_audio_all', text = 'Export All')
+        col.operator('script.operator_export_audio_mixdown', text = 'Export Mixdown')
+        col.operator('script.operator_export_audio_all', text = 'Export Shots')
         col.operator('script.operator_export_audio_individual', text = 'Export Current')
+
+
+#operator class
+class Operator_exportMixdownAudio(bpy.types.Operator):
+    
+    #operator attributes
+    '''Export audio mixdown'''
+    bl_label = 'Operator Export Audio Mixdown'
+    bl_idname = 'script.operator_export_audio_mixdown'
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        return main_checkStuffAudio()
+
+    #execute
+    def execute(self, context):
+        main_exportAudioMixdown()
+        
+        return {'FINISHED'}
 
 
 #operator class
@@ -441,7 +476,7 @@ class Operator_exportAllAudio(bpy.types.Operator):
 
     #execute
     def execute(self, context):
-        main_exportAudioAll()
+        main_exportAudioShots()
         
         return {'FINISHED'}
 
@@ -492,7 +527,7 @@ class Panel_info(bpy.types.Panel):
             if main_getShotNumberOfFrame(bpy.context.scene.frame_current) != None:
                 sh = '%03d' % (main_getShotNumberOfFrame(bpy.context.scene.frame_current),) 
                 sh_len_f = str(main_getShotLength(bpy.context.scene.frame_current))
-                sh_len_s = str(main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps)
+                sh_len_s = ("%.2f" % (main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps))
                 layout.label('Shot: ' + sh)
                 layout.label('Length: ' + sh_len_f + ' (' + sh_len_s + ')')
         else:
@@ -516,6 +551,7 @@ def register():
     bpy.utils.register_class(Operator_exportImagesSequence)
     bpy.utils.register_class(Operator_exportImagesAll)
     bpy.utils.register_class(Operator_exportImagesIndividual)
+    bpy.utils.register_class(Operator_exportMixdownAudio)
     bpy.utils.register_class(Operator_exportAllAudio)
     bpy.utils.register_class(Operator_exportAudioIndividual)
     
@@ -532,6 +568,7 @@ def unregister():
     bpy.utils.unregister_class(Operator_renameMarkers)
     bpy.utils.unregister_class(Operator_exportImagesAll)
     bpy.utils.unregister_class(Operator_exportImagesIndividual)
+    bpy.utils.unregister_class(Operator_exportMixdownAudio)
     bpy.utils.unregister_class(Operator_exportAllAudio)
     bpy.utils.unregister_class(Operator_exportAudioIndividual)
     
