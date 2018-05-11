@@ -99,7 +99,7 @@ def main_getMarkerNameOfFrame(f):
 #------------------------------------------------------------------------------------------------------------------------------
 
 
-def main_stamp(s):
+def main_stamp(n, s, l):
     bpy.context.scene.render.use_stamp = True
     bpy.context.scene.render.stamp_foreground = (1, 1, 1, 1)
     bpy.context.scene.render.stamp_background = (0, 0, 0, 1)
@@ -111,7 +111,7 @@ def main_stamp(s):
     bpy.context.scene.render.use_stamp_camera = False
     bpy.context.scene.render.use_stamp_filename = False
     bpy.context.scene.render.use_stamp_note = True
-    bpy.context.scene.render.stamp_note_text = s
+    bpy.context.scene.render.stamp_note_text = n + ' - ' + s + ' length: ' + l + 'fr'
 
 
 def main_exportImagesAll():
@@ -120,10 +120,13 @@ def main_exportImagesAll():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
     for i in mrks[:-1]:
+        n = '%03d' % (main_getShotNumberOfFrame(i),)
+        n = str(n)
         s = str(main_getMarkerNameOfFrame(i))
+        l = str(main_getShotLength(i))
         bpy.context.scene.frame_set(i)
-        main_stamp(s)
-        bpy.context.scene.render.filepath = '//' + s
+        main_stamp(n, s, l)
+        bpy.context.scene.render.filepath = '//' + n + ' - ' + s
         bpy.ops.render.opengl(write_still = True)
     #reset path and playhead
     bpy.context.scene.render.filepath = fp
@@ -137,9 +140,12 @@ def main_exportImagesAll():
 def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
+    l = str(main_getShotLength(f))
     s = str(main_getMarkerNameOfFrame(f))
-    main_stamp(s)
-    bpy.context.scene.render.filepath = '//' + s
+    n = '%03d' % (main_getShotNumberOfFrame(f),)
+    n = str(n)
+    main_stamp(n, s, l)
+    bpy.context.scene.render.filepath = '//' + n + ' - ' + s
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
     main_openFolder()
