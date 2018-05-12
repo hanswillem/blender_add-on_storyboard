@@ -41,6 +41,14 @@ import os
 #------------------------------------------------------------------------------------------------------------------------------
 
 
+def main_getLeadingZeroes():
+    l = len(bpy.context.scene.timeline_markers)
+    lz = len(str(l))
+    if lz == 1:
+        lz = 2
+    return str(lz)
+
+
 def main_setup():
     bpy.ops.object.camera_add(location=(0, -8, 0), rotation=(math.radians(90), 0, 0))
     bpy.context.space_data.show_only_render = True
@@ -77,7 +85,8 @@ def main_renameMarkers():
         if s == None:
             i.name = 'end'
         else:
-            i.name = 'sh_' + '%03d' % (main_getShotNumberOfFrame(i.frame),)
+            lz = main_getLeadingZeroes()
+            i.name = 'sh_' + ('%0' + lz + 'd') % (main_getShotNumberOfFrame(i.frame),)
 
 
 def main_getMarkerNameOfFrame(f):
@@ -114,15 +123,33 @@ def main_stamp(n, s, l):
     bpy.context.scene.render.stamp_note_text = n + ' - ' + s + ' length: ' + l + 'fr'
 
 
+def main_exportImagesSequence():
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    rng_start = bpy.context.scene.frame_start
+    rng_end = bpy.context.scene.frame_end
+    bpy.context.scene.render.use_stamp = False
+    fp = bpy.context.scene.render.filepath
+    bpy.context.scene.render.filepath = '//seq_' 
+    bpy.context.scene.frame_start = mrks[0]
+    bpy.context.scene.frame_end = mrks[-1]  
+    bpy.ops.render.opengl(animation = True)
+    #reset
+    bpy.context.scene.render.filepath = fp
+    bpy.context.scene.frame_start = rng_start
+    bpy.context.scene.frame_end = rng_end
+
+
 def main_exportImagesAll():
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
+    lz = main_getLeadingZeroes()
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
     for i in mrks[:-1]:
-        n = '%03d' % (main_getShotNumberOfFrame(i),)
+        n = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(i),)
         n = str(n)
-        s = str(main_getMarkerNameOfFrame(i))
+        s = main_getMarkerNameOfFrame(i)
         l = str(main_getShotLength(i))
         bpy.context.scene.frame_set(i)
         main_stamp(n, s, l)
@@ -141,31 +168,15 @@ def main_exportImagesIndividual():
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
     l = str(main_getShotLength(f))
-    s = str(main_getMarkerNameOfFrame(f))
-    n = '%03d' % (main_getShotNumberOfFrame(f),)
+    lz = main_getLeadingZeroes()
+    n = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(f),)
     n = str(n)
+    s = main_getMarkerNameOfFrame(f)
     main_stamp(n, s, l)
     bpy.context.scene.render.filepath = '//' + n + ' - ' + s
     bpy.ops.render.opengl(write_still = True)
     bpy.context.scene.render.filepath = fp
     main_openFolder()
-
-
-def main_exportImagesSequence():
-    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
-    mrks.sort()
-    rng_start = bpy.context.scene.frame_start
-    rng_end = bpy.context.scene.frame_end
-    bpy.context.scene.render.use_stamp = False
-    fp = bpy.context.scene.render.filepath
-    bpy.context.scene.render.filepath = '//seq_' 
-    bpy.context.scene.frame_start = mrks[0]
-    bpy.context.scene.frame_end = mrks[-1]  
-    bpy.ops.render.opengl(animation = True)
-    #reset
-    bpy.context.scene.render.filepath = fp
-    bpy.context.scene.frame_start = rng_start
-    bpy.context.scene.frame_end = rng_end
 
 
 def main_checkStuffImages():
@@ -208,7 +219,9 @@ def main_exportAudioShots():
     for i in range(len(mrks) - 1):
         bpy.context.scene.frame_start = mrks[i]
         bpy.context.scene.frame_end = mrks[i + 1] - 1  
-        bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//') + str(main_getMarkerNameOfFrame(mrks[i])) + '.wav',  container='WAV', codec = 'PCM')
+        lz = main_getLeadingZeroes()
+        n = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(mrks[i]),)
+        bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//') + n + ' - ' + str(main_getMarkerNameOfFrame(mrks[i])) + '.wav', container='WAV', codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
@@ -221,11 +234,13 @@ def main_exportAudioIndividual():
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers] 
     mrks.sort()
     f = bpy.context.scene.frame_current
+    lz = main_getLeadingZeroes()
     for i in range(len(mrks) - 1):
         if mrks[i] <= f < mrks[i + 1]:
             bpy.context.scene.frame_start = mrks[i]
             bpy.context.scene.frame_end = mrks[i + 1] - 1 
-            bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//') + str(main_getMarkerNameOfFrame(mrks[i])) + '.wav', container='WAV', codec = 'PCM')
+            n = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(mrks[i]),)
+            bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//') + n + ' - ' + str(main_getMarkerNameOfFrame(mrks[i])) + '.wav', container='WAV', codec = 'PCM')
     #reset frame range
     bpy.context.scene.frame_start = rng_start
     bpy.context.scene.frame_end = rng_end
@@ -531,7 +546,9 @@ class Panel_info(bpy.types.Panel):
             sh_amnt = str(sh_amnt)
             layout.label('Total Shots: ' + sh_amnt)
             if main_getShotNumberOfFrame(bpy.context.scene.frame_current) != None:
-                sh = str(main_getShotNumberOfFrame(bpy.context.scene.frame_current))
+                lz = main_getLeadingZeroes()   
+                sh = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(bpy.context.scene.frame_current),)
+
                 sh_len_f = str(main_getShotLength(bpy.context.scene.frame_current))
                 sh_len_s = ("%.2f" % (main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps))
                 layout.label('Shot: ' + sh)
