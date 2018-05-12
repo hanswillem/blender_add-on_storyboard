@@ -552,7 +552,7 @@ class Panel_info(bpy.types.Panel):
                 sh_len_f = str(main_getShotLength(bpy.context.scene.frame_current))
                 sh_len_s = ("%.2f" % (main_getShotLength(bpy.context.scene.frame_current) / bpy.context.scene.render.fps))
                 layout.label('Shot: ' + sh)
-                layout.label('Length: ' + sh_len_f + ' (' + sh_len_s + ')')
+                layout.label('Length: ' + sh_len_f +'fr / ' + sh_len_s + 'sec')
         else:
             layout.label('No Shots')
 
