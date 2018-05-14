@@ -63,6 +63,12 @@ def main_openFolder():
     os.system('open ' + (bpy.path.abspath('//')))
 
 
+# Windows
+# def main_openFolder():
+#     import subprocess
+#     subprocess.Popen('explorer ' + bpy.path.abspath('//'))
+
+    
 def main_getShotLength(f):
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
