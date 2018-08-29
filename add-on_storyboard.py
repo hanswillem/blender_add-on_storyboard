@@ -59,9 +59,9 @@ def main_setup():
     area.spaces[0].region_3d.view_perspective = 'CAMERA'
 
 
+# OSX
 def main_openFolder():
     os.system('open ' + (bpy.path.abspath('//')))
-
 
 # Windows
 # def main_openFolder():
@@ -297,7 +297,7 @@ class Panel_setup(bpy.types.Panel):
         col = layout.column(align = True)
         col.operator('script.operator_setup', text = 'Setup Viewport')
         col.operator('script.operator_rename_markers', text = 'Rename Markers')
-        col.operator('script.operator_open_folder', text = 'Open Folder')
+        col.operator('script.operator_open_storyboard_folder', text = 'Open Folder')
         
 
 #operator class
@@ -337,12 +337,12 @@ class Operator_renameMarkers(bpy.types.Operator):
 
 
 #operator class
-class Operator_openFolder(bpy.types.Operator):
+class Operator_openStoryboardFolder(bpy.types.Operator):
     
     #operator attributes
     '''Open folder where the blend file is saved'''
     bl_label = 'Operator Open Folder'
-    bl_idname = 'script.operator_open_folder'
+    bl_idname = 'script.operator_open_storyboard_folder'
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
@@ -576,7 +576,7 @@ def register():
 
     bpy.utils.register_class(Operator_setup)
     bpy.utils.register_class(Operator_renameMarkers)
-    bpy.utils.register_class(Operator_openFolder)
+    bpy.utils.register_class(Operator_openStoryboardFolder)
     bpy.utils.register_class(Operator_exportImagesSequence)
     bpy.utils.register_class(Operator_exportImagesAll)
     bpy.utils.register_class(Operator_exportImagesIndividual)
@@ -592,7 +592,7 @@ def unregister():
     bpy.utils.unregister_class(Panel_info)
 
     bpy.utils.unregister_class(Operator_setup)
-    bpy.utils.unregister_class(Operator_openFolder)
+    bpy.utils.unregister_class(Operator_openStoryboardFolder)
     bpy.utils.unregister_class(Operator_exportImagesSequence)
     bpy.utils.unregister_class(Operator_renameMarkers)
     bpy.utils.unregister_class(Operator_exportImagesAll)
