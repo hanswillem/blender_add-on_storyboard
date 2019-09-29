@@ -16,27 +16,27 @@ Exports the audio as clips based on the shots (i.e. the markers) to the folder w
 
 ### Blender 2.79 version
 
-### Setup Viewport
+#### Setup Viewport
 Creates a camera, sets the viewport display to *Only Render* and *World Background*.
 
-### Open Folder
+#### Open Folder
 Opens the folder where the blendfile is saved in the finder.
 
-### Images - Export Sequence
+#### Images - Export Sequence
 Exports the whole timeline (from the first to the last marker) as a png sequence to the folder where the blendfile is saved.
 
-### Images - Export Shots
+#### Images - Export Shots
 Exports the images to the folder where the blendfile is saved. The length of the shot is stamped into the image.
 Note that it does this based on the shots (i.e. the markers) and not on the keyframes!
 
-### Images - Export Current
+#### Images - Export Current
 Exports the image that is currently in the viewport to the folder where the blendfile is saved. 
 
-### Audio - Export Mixdown
+#### Audio - Export Mixdown
 Exports the whole timeline as audio mixdown to the folder where the blendfile is saved.
 
-### Audio - Export Shots
+#### Audio - Export Shots
 Exports the audio as clips based on the shots (i.e. the markers) to the folder where the blendfile is saved.
 
-### Audio - Export Current
+#### Audio - Export Current
 Exports the audio clips based on the shot currently under the playhead to the folder where the blendfile is saved.
