@@ -3,7 +3,7 @@
 A simple add-on to make creating storyboards in Blender a little easier. 
 To use it, the blendfile must be saved, and you need to place markers in the timeline to divide the scene into shots. Don't forget to place a marker at the end of the last shot.
 
-## Version for Blender 2.80
+## Blender 2.80 version
 
 ### Export Images
 Exports the images to the folder where the blendfile is saved. 
@@ -12,9 +12,9 @@ Note that it does this based on the shots (i.e. the markers) and not on the keyf
 ### Export Audioclips
 Exports the audio as clips based on the shots (i.e. the markers) to the folder where the blendfile is saved.
 
+---
 
-
-## Version for Blender 2.79
+## Blender 2.79 version
 
 ### Setup Viewport
 Creates a camera, sets the viewport display to *Only Render* and *World Background*.
