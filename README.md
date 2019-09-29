@@ -3,6 +3,10 @@
 A simple add-on to make creating storyboards in Blender a little easier. 
 To use it, the blendfile must be saved, and you need to place markers in the timeline to divide the scene into shots. Don't forget to place a marker at the end of the last shot.
 
+## Add-on for Blender 2.79
+
+## Add-on for Blender 2.79
+
 ### Setup Viewport
 Creates a camera, sets the viewport display to *Only Render* and *World Background*.
 
