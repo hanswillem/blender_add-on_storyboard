@@ -51,6 +51,9 @@ def main_checkStuffImages():
     #check if the blend file is saved
     if bpy.data.is_saved == False:
         return False
+    #check if the format is set to a movie fromat
+    if bpy.context.scene.render.is_movie_format == True:
+        return False
 
     else:
         return True
