@@ -12,6 +12,8 @@ Note that it does this based on the shots (i.e. the markers) and not on the keyf
 ### Export Audioclips
 Exports the audio as clips based on the shots (i.e. the markers) to the folder where the blendfile is saved.
 
+
+
 ## Version for Blender 2.79
 
 ### Setup Viewport
