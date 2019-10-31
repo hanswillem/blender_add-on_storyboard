@@ -1,15 +1,16 @@
+
 bl_info = {
     'name' : 'Storyboard',
     'author' : 'Hans Willem Gijzel',
-    'version' : (1, 0),
-    'blender' : (2, 80, 0  ),
+    'version' : (1, 1),
+    'blender' : (2, 81, 0  ),
     'location' : 'View 3D > Tools > Storyboard',
     'description' : 'Tools for storyboarding',
     'warning' : '',
     'wiki_url' : '',
     'category' : 'Storyboard'
     }
-
+ 
 #imports
 import bpy
 import subprocess
@@ -44,17 +45,32 @@ def main_getMarkerNameOfFrame(f):
         if mrks[i] <= f < mrks[i + 1]:
             return  d_mrks[mrks[i]]
 
+#PNG settings
+def main_setPNG():
+    bpy.context.scene.render.image_settings.file_format = 'PNG'
+    bpy.context.scene.render.use_file_extension = True
+
+#h264 settings
+def main_setH264():
+    bpy.context.scene.render.use_file_extension = False
+    bpy.context.scene.render.image_settings.file_format = 'FFMPEG'
+    bpy.context.scene.render.ffmpeg.format = 'MPEG4'
+    bpy.context.scene.render.ffmpeg.codec = 'H264'
+    bpy.context.scene.render.ffmpeg.gopsize = 1
+    #turn on the audio
+    bpy.context.scene.render.ffmpeg.audio_codec = 'AAC'
+
+
 def main_checkStuffImages():
+    #check if there is a cam
+    if not bpy.context.scene.camera:
+        return False
     #check if there are markers
-    if len(bpy.context.scene.timeline_markers) == 0:
+    if len(bpy.context.scene.timeline_markers) < 2:
         return False
     #check if the blend file is saved
     if bpy.data.is_saved == False:
         return False
-    #check if the format is set to a movie fromat
-    if bpy.context.scene.render.is_movie_format == True:
-        return False
-
     else:
         return True
 
@@ -78,6 +94,12 @@ def main_checkStuffAudio():
     else:
         return True
 
+def main_checkStuffExport():
+    if not bpy.context.scene.camera:
+        return False
+    else:
+        return True
+
 def main_exportAudioShots():
     rng_start = bpy.context.scene.frame_start
     rng_end = bpy.context.scene.frame_end
@@ -95,6 +117,7 @@ def main_exportAudioShots():
     main_openFolder()
     
 def main_exportImages():
+    main_setPNG()
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
     lz = main_getLeadingZeroes()
@@ -105,11 +128,17 @@ def main_exportImages():
         n = str(n)
         s = main_getMarkerNameOfFrame(i)
         bpy.context.scene.frame_set(i)
-        bpy.context.scene.render.filepath = '//' + n + ' - ' + s
+        bpy.context.scene.render.filepath = '//' + n + '_' + s 
         bpy.ops.render.render(write_still = True)
     #reset path and playhead
     bpy.context.scene.render.filepath = fp
     bpy.context.scene.frame_set(f)
+    main_openFolder()
+    
+def main_exportH264():
+    bpy.context.scene.render.filepath = '//export.mp4'
+    main_setH264()
+    bpy.ops.render.render('INVOKE_DEFAULT', animation=True)
     main_openFolder()
 
 # --------------------------------------------------------------------------------------------------------------------------------------------
@@ -135,6 +164,7 @@ class STORYBOARDPANEL_PT_Panel(bpy.types.Panel):
         col = layout.column(align = True)
         col.operator('script.storyboard_export_images', text = 'Export Images')
         col.operator('script.storyboard_export_audioclips', text = 'Export Audioclips')
+        col.operator('script.storyboard_export_h264', text = 'Export H264')
         
 #operator class
 class STORYBOARDEXPORTIMAGES_OT_Operator(bpy.types.Operator):
@@ -170,11 +200,29 @@ class STORYBOARDEXPORTAUDIOCLIPS_OT_Operator(bpy.types.Operator):
         main_exportAudioShots()
         return {'FINISHED'}
 
+#operator class
+class STORYBOARDEXPORTH264_OT_Operator(bpy.types.Operator):
+    #operator attributes
+    """Tooltip"""
+    bl_label = 'Export Storyboard H264'
+    bl_idname = 'script.storyboard_export_h264'
+    
+    #poll - if the poll function returns False, the button will be greyed out
+    @classmethod
+    def poll(cls, context):
+        return main_checkStuffExport()
+    
+    #execute
+    def execute(self, context):
+        main_exportH264()
+        return {'FINISHED'}
+
 #registration
 classes = (
     STORYBOARDPANEL_PT_Panel,
     STORYBOARDEXPORTIMAGES_OT_Operator,
     STORYBOARDEXPORTAUDIOCLIPS_OT_Operator,
+    STORYBOARDEXPORTH264_OT_Operator
 )
 
 def register():
