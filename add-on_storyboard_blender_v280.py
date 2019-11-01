@@ -130,9 +130,13 @@ def main_exportAudioShots():
     rng_end = bpy.context.scene.frame_end
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
-    for i in range(len(mrks) - 1):
+    for i in range(len(mrks)):
         bpy.context.scene.frame_start = mrks[i]
-        bpy.context.scene.frame_end = mrks[i + 1] - 1  
+        if i < len(mrks) - 1:
+            bpy.context.scene.frame_end = mrks[i + 1] - 1
+        else:
+            bpy.context.scene.frame_end = rng_end
+            
         lz = main_getLeadingZeroes()
         n = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(mrks[i]),)
         bpy.ops.sound.mixdown(filepath = bpy.path.abspath('//') + n + '_' + str(main_getMarkerNameOfFrame(mrks[i])) + '.wav', container='WAV', codec = 'PCM')
