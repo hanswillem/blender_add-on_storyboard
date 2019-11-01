@@ -125,6 +125,7 @@ def main_checkStuffExport():
     else:
         return True
 
+
 def main_exportAudioShots():
     rng_start = bpy.context.scene.frame_start
     rng_end = bpy.context.scene.frame_end
@@ -211,6 +212,7 @@ class STORYBOARDPANEL_PT_Panel(bpy.types.Panel):
         col.operator('script.storyboard_export_images', text = 'Export All Images')
         col.operator('script.storyboard_export_audioclips', text = 'Export All Audioclips')
         col.operator('script.storyboard_export_h264', text = 'Export H264')
+        col.operator('script.storyboard_open_folder', text = 'Open Folder')
         
 #operator class
 class STORYBOARDEXPORTIMAGES_OT_Operator(bpy.types.Operator):
@@ -280,13 +282,32 @@ class STORYBOARDEXPORTH264_OT_Operator(bpy.types.Operator):
         main_exportH264()
         return {'FINISHED'}
 
+#operator class
+class STORYBOARDOPENFOLDER_OT_Operator(bpy.types.Operator):
+    #operator attributes
+    """Tooltip"""
+    bl_label = 'Export Storyboard Open Folder'
+    bl_idname = 'script.storyboard_open_folder'
+    
+    #poll - if the poll function returns False, the button will be greyed out
+    @classmethod
+    def poll(cls, context):
+        return bpy.data.is_saved
+    
+    #execute
+    def execute(self, context):
+        main_openFolder()
+        return {'FINISHED'}
+
+
 #registration
 classes = (
     STORYBOARDPANEL_PT_Panel,
     STORYBOARDEXPORTIMAGES_OT_Operator,
     STORYBOARDEXPORTSINGLEIMAGE_OT_Operator,
     STORYBOARDEXPORTAUDIOCLIPS_OT_Operator,
-    STORYBOARDEXPORTH264_OT_Operator
+    STORYBOARDEXPORTH264_OT_Operator,
+    STORYBOARDOPENFOLDER_OT_Operator
 )
 
 def register():
