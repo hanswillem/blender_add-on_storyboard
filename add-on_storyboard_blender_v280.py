@@ -28,7 +28,10 @@ def main_getLeadingZeroes():
 def main_getShotNumberOfFrame(f):
     mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
     mrks.sort()
+
     for i in range(len(mrks) - 1):
+        if f >= mrks[-1]:
+            return len(mrks)
         if mrks[i] <= f < mrks[i + 1]:
             return i + 1
 
@@ -42,6 +45,8 @@ def main_getMarkerNameOfFrame(f):
     mrks.sort()
     # get the marker name and return it
     for i in range(len(mrks) - 1):
+        if f >= mrks[-1]:
+            return d_mrks[mrks[-1]]
         if mrks[i] <= f < mrks[i + 1]:
             return  d_mrks[mrks[i]]
 
@@ -60,13 +65,30 @@ def main_setH264():
     #turn on the audio
     bpy.context.scene.render.ffmpeg.audio_codec = 'AAC'
 
-
 def main_checkStuffImages():
     #check if there is a cam
     if not bpy.context.scene.camera:
         return False
     #check if there are markers
     if len(bpy.context.scene.timeline_markers) < 2:
+        return False
+    #check if the blend file is saved
+    if bpy.data.is_saved == False:
+        return False
+    else:
+        return True
+
+def main_checkStuffSingleImage():
+    #check if there is a cam
+    if not bpy.context.scene.camera:
+        return False
+    #check if there are markers
+    if len(bpy.context.scene.timeline_markers) < 2:
+        return False
+    #check if current frame is before first marker
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    if bpy.context.scene.frame_current < mrks[0]:
         return False
     #check if the blend file is saved
     if bpy.data.is_saved == False:
@@ -95,6 +117,9 @@ def main_checkStuffAudio():
         return True
 
 def main_checkStuffExport():
+    #check if the blend file is saved
+    if bpy.data.is_saved == False:
+        return False
     if not bpy.context.scene.camera:
         return False
     else:
@@ -123,7 +148,7 @@ def main_exportImages():
     lz = main_getLeadingZeroes()
     fp = bpy.context.scene.render.filepath
     f = bpy.context.scene.frame_current
-    for i in mrks[:-1]:
+    for i in mrks:
         n = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(i),)
         n = str(n)
         s = main_getMarkerNameOfFrame(i)
@@ -133,6 +158,22 @@ def main_exportImages():
     #reset path and playhead
     bpy.context.scene.render.filepath = fp
     bpy.context.scene.frame_set(f)
+    main_openFolder()
+    
+def main_exportSingleImage():
+    main_setPNG()
+    mrks = [marker.frame for marker in bpy.context.scene.timeline_markers]
+    mrks.sort()
+    lz = main_getLeadingZeroes()
+    fp = bpy.context.scene.render.filepath
+    f = bpy.context.scene.frame_current
+    n = ('%0' + lz + 'd') % (main_getShotNumberOfFrame(f),)
+    n = str(n)
+    s = main_getMarkerNameOfFrame(f)
+    bpy.context.scene.render.filepath = '//' + n + '_' + s 
+    bpy.ops.render.render(write_still = True)
+    #reset path and playhead
+    bpy.context.scene.render.filepath = fp
     main_openFolder()
     
 def main_exportH264():
@@ -162,8 +203,9 @@ class STORYBOARDPANEL_PT_Panel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         col = layout.column(align = True)
-        col.operator('script.storyboard_export_images', text = 'Export Images')
-        col.operator('script.storyboard_export_audioclips', text = 'Export Audioclips')
+        col.operator('script.storyboard_export_single_image', text = 'Export Single Image')
+        col.operator('script.storyboard_export_images', text = 'Export All Images')
+        col.operator('script.storyboard_export_audioclips', text = 'Export All Audioclips')
         col.operator('script.storyboard_export_h264', text = 'Export H264')
         
 #operator class
@@ -181,6 +223,23 @@ class STORYBOARDEXPORTIMAGES_OT_Operator(bpy.types.Operator):
     #execute
     def execute(self, context):
         main_exportImages()
+        return {'FINISHED'}
+
+#operator class
+class STORYBOARDEXPORTSINGLEIMAGE_OT_Operator(bpy.types.Operator):
+    #operator attributes
+    """Tooltip"""
+    bl_label = 'Export Storyboard Single Image'
+    bl_idname = 'script.storyboard_export_single_image'
+    
+    #poll - if the poll function returns False, the button will be greyed out
+    @classmethod
+    def poll(cls, context):
+        return main_checkStuffSingleImage()
+    
+    #execute
+    def execute(self, context):
+        main_exportSingleImage()
         return {'FINISHED'}
     
 #operator class
@@ -221,6 +280,7 @@ class STORYBOARDEXPORTH264_OT_Operator(bpy.types.Operator):
 classes = (
     STORYBOARDPANEL_PT_Panel,
     STORYBOARDEXPORTIMAGES_OT_Operator,
+    STORYBOARDEXPORTSINGLEIMAGE_OT_Operator,
     STORYBOARDEXPORTAUDIOCLIPS_OT_Operator,
     STORYBOARDEXPORTH264_OT_Operator
 )
