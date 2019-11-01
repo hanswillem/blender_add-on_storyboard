@@ -30,7 +30,7 @@ Opens the folder where the blendfile is saved.
 Creates a camera, sets the viewport display to *Only Render* and *World Background*.
 
 #### Open Folder
-Opens the folder where the blendfile is saved in the finder.
+Opens the folder where the blendfile is saved.
 
 #### Images - Export Sequence
 Exports the whole timeline (from the first to the last marker) as a png sequence to the folder where the blendfile is saved.
