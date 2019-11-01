@@ -5,12 +5,19 @@ To use it, the blendfile must be saved, and you need to place markers in the tim
 
 ### Blender 2.80 version
 
-#### Export Images
+#### Export Single Image
+Exports a single image to the folder where the blendfile is saved. 
+The name of the image will be the same as the marker name of the shot.
+
+#### Export All Images
 Exports the images to the folder where the blendfile is saved. 
-Note that it does this based on the shots (i.e. the markers) and not on the keyframes!
+The names of the images will be the same as the marker names of the shot.
 
 #### Export Audioclips
 Exports the audio as clips based on the shots (i.e. the markers) to the folder where the blendfile is saved.
+
+#### Export H264
+Exports the full timeline as an mp4 (h264).
 
 ---
 
