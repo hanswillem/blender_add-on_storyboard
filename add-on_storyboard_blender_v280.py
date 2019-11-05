@@ -1,4 +1,3 @@
-
 bl_info = {
     'name' : 'Storyboard',
     'author' : 'Hans Willem Gijzel',
@@ -194,7 +193,7 @@ class STORYBOARDPANEL_PT_Panel(bpy.types.Panel):
     #panel attributes
     """Tooltip"""
     bl_label = 'Storyboard'
-    bl_idname = 'MYPANEL_PT_Panel'
+    bl_idname = 'STORYBOARD_PT_Panel'
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = 'Storyboard'
